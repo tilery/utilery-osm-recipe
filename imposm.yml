@@ -3,6 +3,8 @@ generalized_tables:
     tolerance: 200.0}
   landusages_gen1: {source: landusages, sql_filter: ST_Area(geometry)>50000.000000,
     tolerance: 50.0}
+  railways_gen0: {source: railways_gen1, sql_filter: "type='rail'", tolerance: 200.0}
+  railways_gen1: {source: railways, sql_filter: "type in ('rail','subway')", tolerance: 50.0}
   roads_gen0: {source: roads_gen1, sql_filter: null, tolerance: 200.0}
   roads_gen1: {source: roads, sql_filter: 'type IN (''motorway'', ''motorway_link'',
       ''trunk'', ''trunk_link'', ''primary'', ''primary_link'', ''secondary'', ''secondary_link'',
@@ -185,8 +187,8 @@ tables:
     - {key: oneway, name: oneway, type: direction}
     - {key: ref, name: ref, type: string}
     - {key: layer, name: z_order, type: wayzorder}
-    - {key: access, name: access, type: string}
     - {key: service, name: service, type: string}
+    - {key: highspeed, name: highspeed, type: boolint}
     - {key: null, name: class, type: mapping_key}
     filters:
       exclude_tags:
