@@ -7,12 +7,12 @@ layers:
     - maxzoom: 9
       sql: |-
         SELECT
-          geometry as way, type, name, tunnel, bridge,
+          geometry AS way, type, name, tunnel, bridge,
           (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
                 WHEN type IN ('trunk', 'trunk_link', 'secondary', 'primary') THEN 'major_road'
-                ELSE 'minor_road' END) AS kind,
-          (CASE WHEN type LIKE '%_link' THEN 'yes'
-                ELSE 'no' END) AS is_link
+                ELSE 'minor_road' END) AS category,
+          (CASE WHEN type LIKE '%_link' THEN 1
+                ELSE 0 END) AS link
         FROM
           osm_roads_gen0
         ORDER BY
@@ -21,12 +21,12 @@ layers:
       maxzoom: 12
       sql: |-
         SELECT
-          geometry as way, type, name, tunnel, bridge,
+          geometry AS way, type, name, tunnel, bridge,
           (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
                 WHEN type IN ('trunk', 'trunk_link', 'secondary', 'primary') THEN 'major_road'
-                ELSE 'minor_road' END) AS kind,
-          (CASE WHEN type LIKE '%_link' THEN 'yes'
-                ELSE 'no' END) AS is_link
+                ELSE 'minor_road' END) AS category,
+          (CASE WHEN type LIKE '%_link' THEN 1
+                ELSE 0 END) AS link
         FROM
           osm_roads_gen1
         ORDER BY
@@ -39,9 +39,9 @@ layers:
           (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
                 WHEN type IN ('trunk', 'trunk_link', 'primary', 'primary_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link') THEN 'major_road'
                 WHEN type IN ('footpath', 'track', 'footway', 'steps', 'pedestrian', 'path', 'cycleway') THEN 'path'
-                ELSE 'minor_road' END) AS kind,
-          (CASE WHEN type LIKE '%_link' THEN 'yes'
-                ELSE 'no' END) AS is_link
+                ELSE 'minor_road' END) AS category,
+          (CASE WHEN type LIKE '%_link' THEN 1
+                ELSE 0 END) AS link
         FROM
           osm_roads
         ORDER BY
