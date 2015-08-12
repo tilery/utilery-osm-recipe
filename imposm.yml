@@ -147,7 +147,7 @@ tables:
     - {key: population, name: population, type: integer}
     mapping:
       place: [country, state, region, county, city, town, village, hamlet, suburb,
-        locality]
+        locality, isolated_dwelling]
     type: point
   roads:
     fields:
