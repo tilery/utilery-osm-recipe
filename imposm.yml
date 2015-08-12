@@ -237,6 +237,8 @@ tables:
     - {key: null, name: geometry, type: geometry}
     - {key: name, name: name, type: string}
     - {key: null, name: type, type: mapping_value}
+    - {key: tunnel, name: tunnel, type: boolint}
+    - {key: bridge, name: bridge, type: boolint}
     mapping:
       barrier: [ditch]
       waterway: [stream, river, canal, drain, ditch]
