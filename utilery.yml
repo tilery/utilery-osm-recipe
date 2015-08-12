@@ -1,6 +1,44 @@
 buffer: 16
 srid: 3857
 layers:
+- name: places
+  buffer: 128
+  queries:
+    - maxzoom: 4
+      sql: |-
+        SELECT
+          name, type, name, osm_id, geometry AS way
+        FROM
+          osm_places
+        WHERE
+          name IS NOT NULL
+          AND type IN ('continent','ocean','country')
+        ORDER BY
+          z_order ASC
+    - minzoom: 5
+      maxzoom: 13
+      sql: |-
+        SELECT
+          name, type, name, osm_id, geometry AS way
+        FROM
+          osm_places
+        WHERE
+          name IS NOT NULL
+          AND type IN ('city','county','province','island','town','lake','village')
+        ORDER BY
+          z_order ASC
+    - minzoom: 14
+      maxzoom: 22
+      sql: |-
+        SELECT
+          name, type, name, osm_id, geometry AS way
+        FROM
+          osm_places
+        WHERE
+          name IS NOT NULL
+          AND type IN ('city','county','province','island','town','neighbourhood','suburb','locality','lake','village','hamlet','isolated_dwelling')
+        ORDER BY
+          z_order ASC
 - name: "roads"
   clip: true
   queries:
