@@ -39,7 +39,6 @@ layers:
           (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
                 WHEN type IN ('trunk', 'trunk_link', 'primary', 'primary_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link') THEN 'major_road'
                 WHEN type IN ('footpath', 'track', 'footway', 'steps', 'pedestrian', 'path', 'cycleway') THEN 'path'
-                WHEN type IN ('rail', 'tram', 'light_rail', 'narrow_gauge', 'monorail') THEN 'rail'
                 ELSE 'minor_road' END) AS kind,
           (CASE WHEN type LIKE '%_link' THEN 'yes'
                 ELSE 'no' END) AS is_link
