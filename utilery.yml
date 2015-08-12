@@ -33,7 +33,6 @@ layers:
           z_order ASC
     - minzoom: 13
       maxzoom: 20
-      srid: 3857
       sql: |-
         SELECT
           geometry AS way, type, name, tunnel, bridge, osm_id,
