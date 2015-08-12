@@ -173,7 +173,6 @@ tables:
             secondary, secondary_link, tertiary, tertiary_link, road, path, track,
             service, footway, bridleway, cycleway, steps, pedestrian, living_street,
             unclassified, residential, raceway]
-          man_made: [pier, groyne]
     type: linestring
   railways:
     fields:
