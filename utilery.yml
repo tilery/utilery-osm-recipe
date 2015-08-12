@@ -125,19 +125,6 @@ layers:
           osm_roads
         ORDER BY
           z_order ASC
-- name: places
-  queries:
-    - maxzoom: 7
-      sql: |-
-        SELECT
-          name, type
-        FROM
-          osm_places
-        WHERE
-          name IS NOT NULL
-          AND place IN ('city','county','province','island','town','lake')
-        ORDER BY
-          population DESC
 - name: landuse
   clip: true
   buffer: 8
