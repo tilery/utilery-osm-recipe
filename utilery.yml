@@ -1,4 +1,4 @@
-buffer: 0
+buffer: 16
 srid: 3857
 layers:
 - name: "roads"
