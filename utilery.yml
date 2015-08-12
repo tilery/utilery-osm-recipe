@@ -1,0 +1,63 @@
+buffer: 0
+srid: 3857
+layers:
+- name: "roads"
+  clip: true
+  queries:
+    - maxzoom: 9
+      sql: |-
+        SELECT
+          geometry as way, type, name, tunnel, bridge,
+          (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
+                WHEN type IN ('trunk', 'trunk_link', 'secondary', 'primary') THEN 'major_road'
+                ELSE 'minor_road' END) AS kind,
+          (CASE WHEN type LIKE '%_link' THEN 'yes'
+                ELSE 'no' END) AS is_link
+        FROM
+          osm_roads_gen0
+        ORDER BY
+          z_order ASC
+    - minzoom: 10
+      maxzoom: 12
+      sql: |-
+        SELECT
+          geometry as way, type, name, tunnel, bridge,
+          (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
+                WHEN type IN ('trunk', 'trunk_link', 'secondary', 'primary') THEN 'major_road'
+                ELSE 'minor_road' END) AS kind,
+          (CASE WHEN type LIKE '%_link' THEN 'yes'
+                ELSE 'no' END) AS is_link
+        FROM
+          osm_roads_gen1
+        ORDER BY
+          z_order ASC
+    - minzoom: 13
+      maxzoom: 20
+      srid: 3857
+      sql: |-
+        SELECT
+          geometry AS way, type, name, tunnel, bridge, osm_id,
+          (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
+                WHEN type IN ('trunk', 'trunk_link', 'primary', 'primary_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link') THEN 'major_road'
+                WHEN type IN ('footpath', 'track', 'footway', 'steps', 'pedestrian', 'path', 'cycleway') THEN 'path'
+                WHEN type IN ('rail', 'tram', 'light_rail', 'narrow_gauge', 'monorail') THEN 'rail'
+                ELSE 'minor_road' END) AS kind,
+          (CASE WHEN type LIKE '%_link' THEN 'yes'
+                ELSE 'no' END) AS is_link
+        FROM
+          osm_roads
+        ORDER BY
+          z_order ASC
+- name: places
+  queries:
+    - maxzoom: 7
+      sql: |-
+        SELECT
+          name, type
+        FROM
+          osm_places
+        WHERE
+          name IS NOT NULL
+          AND place IN ('city','county','province','island','town','lake')
+        ORDER BY
+          population DESC
