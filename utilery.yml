@@ -125,6 +125,78 @@ layers:
           osm_roads
         ORDER BY
           z_order ASC
+- name: road_labels
+  clip: true
+  buffer: -2
+  queries:
+    - maxzoom: 9
+      sql: |-
+        SELECT
+          ST_SimplifyPreserveTopology(ST_LineMerge(ST_Collect(geometry)),!pixel_width!) AS way,
+          type, name, ref, tunnel, bridge,
+          (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
+                WHEN type IN ('trunk', 'trunk_link', 'secondary', 'primary') THEN 'major_road'
+                ELSE 'minor_road' END) AS category
+        FROM
+          osm_roads_gen0
+        WHERE
+          geometry && !bbox! AND name != ''
+        GROUP BY
+          type, name, ref, tunnel, bridge,category,z_order
+        ORDER BY
+          z_order ASC
+    - minzoom: 10
+      maxzoom: 12
+      sql: |-
+        SELECT
+          ST_LineMerge(ST_Collect(geometry)) AS way,
+          type, name, ref, tunnel, bridge,
+          (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
+                WHEN type IN ('trunk', 'trunk_link', 'secondary', 'primary') THEN 'major_road'
+                ELSE 'minor_road' END) AS category
+        FROM
+          osm_roads_gen1
+        WHERE
+          geometry && !bbox! AND name != ''
+        GROUP BY
+          type, name, ref, tunnel, bridge,category,z_order
+        ORDER BY
+          z_order ASC, st_length(ST_LineMerge(ST_Collect(geometry))) ASC
+    - minzoom: 13
+      maxzoom: 14
+      sql: |-
+        SELECT
+          ST_LineMerge(ST_Collect(geometry)) AS way,
+          type, name, ref, tunnel, bridge,
+          (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
+                WHEN type IN ('trunk', 'trunk_link', 'secondary', 'primary') THEN 'major_road'
+                ELSE 'minor_road' END) AS category
+        FROM
+          osm_roads_gen1
+        WHERE
+          geometry && !bbox! AND name != ''
+        GROUP BY
+          type, name, ref, tunnel, bridge,category,z_order
+        ORDER BY
+          z_order ASC, st_length(ST_LineMerge(ST_Collect(geometry))) ASC
+    - minzoom: 15
+      maxzoom: 20
+      sql: |-
+        SELECT
+          ST_LineMerge(ST_Collect(geometry)) AS way,
+          type, name, ref, tunnel, bridge, osm_id,
+          (CASE WHEN type IN ('motorway', 'motorway_link') THEN 'highway'
+                WHEN type IN ('trunk', 'trunk_link', 'primary', 'primary_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link') THEN 'major_road'
+                WHEN type IN ('footpath', 'track', 'footway', 'steps', 'pedestrian', 'path', 'cycleway') THEN 'path'
+                ELSE 'minor_road' END) AS category
+        FROM
+          osm_roads
+        WHERE
+          geometry && !bbox! AND name||ref != ''
+        GROUP BY
+          type, name, ref, tunnel, bridge, category, osm_id, z_order
+        ORDER BY
+          z_order ASC
 - name: landuse
   clip: true
   buffer: 8
