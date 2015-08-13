@@ -1,4 +1,6 @@
 generalized_tables:
+  buildings_gen0: {source: buildings, sql_filter: "area>1500.000000 AND amenity || shop || leisure != ''",
+    tolerance: 50.0}
   landusages_gen0: {source: landusages_gen1, sql_filter: ST_Area(geometry)>500000.000000,
     tolerance: 200.0}
   landusages_gen1: {source: landusages, sql_filter: ST_Area(geometry)>50000.000000,
@@ -71,7 +73,11 @@ tables:
     - {key: null, name: osm_id, type: id}
     - {key: null, name: geometry, type: geometry}
     - {key: name, name: name, type: string}
+    - {key: amenity, name: amenity, type: string}
+    - {key: leisure, name: leisure, type: string}
+    - {key: shop, name: shop, type: string}
     - {key: null, name: type, type: mapping_value}
+    - {key: null, name: area, type: pseudoarea}
     mapping:
       building: [__any__]
     type: polygon

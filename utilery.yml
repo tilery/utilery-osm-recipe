@@ -1,13 +1,33 @@
 buffer: 16
 srid: 3857
 layers:
+- name: buildings
+  queries:
+    - minzoom: 12
+      maxzoom: 13
+      sql: |-
+        SELECT
+          name, type, osm_id, geometry AS way
+        FROM
+          osm_buildings_gen0
+        ORDER BY
+          area DESC
+    - minzoom: 14
+      maxzoom: 22
+      sql: |-
+        SELECT
+          name, type, osm_id, geometry AS way
+        FROM
+          osm_buildings
+        ORDER BY
+          area DESC
 - name: places
   buffer: 128
   queries:
     - maxzoom: 4
       sql: |-
         SELECT
-          name, type, name, osm_id, geometry AS way
+          name, type, osm_id, geometry AS way
         FROM
           osm_places
         WHERE
@@ -19,7 +39,7 @@ layers:
       maxzoom: 13
       sql: |-
         SELECT
-          name, type, name, osm_id, geometry AS way
+          name, type, osm_id, geometry AS way
         FROM
           osm_places
         WHERE
