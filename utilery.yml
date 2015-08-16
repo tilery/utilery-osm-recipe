@@ -266,6 +266,57 @@ layers:
           osm_landusages
         ORDER BY
           z_order DESC, area DESC
+- name: landuse_labels
+  clip: false
+  buffer: 128
+  queries:
+    - maxzoom: 9
+      sql: |-
+        SELECT
+          ST_PointOnSurface(ST_Union(geometry)) AS way,
+          round(log(sum(area))::numeric,0)::int as area_log,
+          length(name) as name_length,
+          type, name
+        FROM
+          osm_landusages_gen0
+        WHERE
+          geometry && !bbox! and name !='' and area>(100*!pixel_width!*!pixel_width!)
+        GROUP BY
+          type,name,z_order
+        ORDER BY
+          z_order DESC, sum(area) DESC
+    - minzoom: 10
+      maxzoom: 12
+      sql: |-
+        SELECT
+          ST_PointOnSurface(ST_Union(geometry)) AS way,
+          round(log(sum(area))::numeric,0)::int as area_log,
+          length(name) as name_length,
+          type, name
+        FROM
+          osm_landusages_gen1
+        WHERE
+          geometry && !bbox! and name !='' and area>(100*!pixel_width!*!pixel_width!)
+        GROUP BY
+          type,name,z_order
+        ORDER BY
+          z_order DESC, sum(area) DESC
+    - minzoom: 13
+      maxzoom: 20
+      sql: |-
+        SELECT
+          ST_PointOnSurface(ST_Union(geometry)) AS way,
+          round(log(sum(area))::numeric,0)::int as area_log,
+          length(name) as name_length,
+          type, name
+        FROM
+          (SELECT name,type,area,z_order,geometry FROM osm_landusages UNION SELECT name,type,area,0 as z_order,geometry FROM osm_waterareas) as areas
+        WHERE
+          geometry && !bbox! and name !='' and area>(100*!pixel_width!*!pixel_width!)
+        GROUP BY
+          type,name,z_order
+        ORDER BY
+          z_order DESC, sum(area) DESC
 - name: waterarea
   clip: true
   buffer: 8
