@@ -7,12 +7,29 @@ layers:
       maxzoom: 13
       sql: |-
         SELECT
-          name, type, osm_id, geometry AS way
+          name, type, 0 as osm_id, ST_Union(geometry) AS way
         FROM
           osm_buildings_gen0
+        WHERE
+          geometry && !bbox!
+        GROUP BY
+          name, type
         ORDER BY
-          area DESC
+          sum(area) DESC
     - minzoom: 14
+      maxzoom: 16
+      sql: |-
+        SELECT
+          name, type, 0 as osm_id, ST_SimplifyPreserveTopology(ST_Union(geometry),!pixel_width!/2) AS way
+        FROM
+          osm_buildings
+        WHERE
+          geometry && !bbox!
+        GROUP BY
+          name, type
+        ORDER BY
+          sum(area) DESC
+    - minzoom: 17
       maxzoom: 22
       sql: |-
         SELECT
