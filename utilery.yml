@@ -425,7 +425,7 @@ layers:
         SELECT
           geom AS way, nom, regexp_replace(regexp_replace(osm_nom,'^[1-9].*','Paris'),'[1-9].*','') as osm_nom, couleur::int as couleur
         FROM
-          tgi
+          zonage_tgi
         WHERE geom && !bbox!
 - name: poi_commissariats_brigades
   clip: true
@@ -437,7 +437,7 @@ layers:
         SELECT
           geom AS way, service, case when service ~ '^Commissariat' then 'Police' else 'Gendarmerie' end as type
         FROM
-          poi_tgi
+          poi_commissariats_brigades
         ORDER BY
           service DESC
 - name: zonage_commissariats_brigades
@@ -452,7 +452,7 @@ layers:
         FROM
           communes c
         JOIN
-          poi_tgi_communes p ON (p.code_commune=c.insee)
+          zonage_police_gendarmerie p ON (p.code_commune=c.insee)
         WHERE
           c.geom && st_transform(!bbox!,4326)
         GROUP BY
