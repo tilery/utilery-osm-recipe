@@ -415,4 +415,46 @@ layers:
           geometry AS way, type, name, tunnel, bridge
         FROM
           osm_waterways
+- name: zonage_tgi
+  clip: true
+  buffer: 8
+  queries:
+    - minzoom: 6
+      maxzoom: 20
+      sql: |-
+        SELECT
+          geom AS way, nom, regexp_replace(regexp_replace(osm_nom,'^[1-9].*','Paris'),'[1-9].*','') as osm_nom, couleur::int as couleur
+        FROM
+          tgi
+        WHERE geom && !bbox!
+- name: poi_commissariats_brigades
+  clip: true
+  buffer: 8
+  queries:
+    - minzoom: 10
+      maxzoom: 20
+      sql: |-
+        SELECT
+          geom AS way, service, case when service ~ '^Commissariat' then 'Police' else 'Gendarmerie' end as type
+        FROM
+          poi_tgi
+        ORDER BY
+          service DESC
+- name: zonage_commissariats_brigades
+  clip: true
+  buffer: 8
+  queries:
+    - minzoom: 10
+      maxzoom: 20
+      sql: |-
+        SELECT
+          st_SimplifyPreserveTopology(st_transform(st_union(c.geom),3857),!pixel_width!) AS way, p.institution, regexp_replace(regexp_replace(regexp_replace(regexp_replace(service,'Brigade de proximit.','BP '),'Brigade territoriale autonome','BT'),'Commissariat de police','Comm.'),'-',' ','g') as service
+        FROM
+          communes c
+        JOIN
+          poi_tgi_communes p ON (p.code_commune=c.insee)
+        WHERE
+          c.geom && st_transform(!bbox!,4326)
+        GROUP BY
+          institution,service
 
