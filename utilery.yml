@@ -117,6 +117,27 @@ layers:
           osm_railways
         ORDER BY
           z_order, highspeed DESC, coalesce(service,'') DESC
+- name: landuse_auto
+  clip: true
+  buffer: 8
+  queries:
+    - minzoom: 11
+      maxzoom: 15
+      sql: |-
+        SELECT
+          ST_SimplifyPreserveTopology(ST_Union(ST_buffer(geometry,20,'join=mitre')),!pixel_width!/2) AS way, 'railway' as type, ST_Area(ST_Union(ST_buffer(geometry,20))) as area
+        FROM
+          osm_railways
+        WHERE
+          service in ('yard','spur','siding') and geometry && !bbox!
+        UNION
+        SELECT
+          ST_SimplifyPreserveTopology(ST_Union(ST_buffer(b.geometry,50,'join=mitre mitre_limit=1')),!pixel_width!/2) AS way, 'buildings' as type, ST_Area(ST_Union(ST_buffer(b.geometry,50))) as area
+        FROM
+          osm_buildings b
+        LEFT JOIN osm_landusages l ON (ST_Intersects(l.geometry, b.geometry) and l.type in ('residential','retail','industrial','farmyard'))
+        WHERE
+          b.geometry && !bbox! and b.area>50 and l.type is null
 - name: roads
   clip: true
   queries:
@@ -181,7 +202,7 @@ layers:
         GROUP BY
           type, name, ref, tunnel, bridge,category,z_order
         ORDER BY
-          z_order ASC
+          z_order DESC
     - minzoom: 10
       maxzoom: 12
       sql: |-
@@ -245,19 +266,32 @@ layers:
         FROM
           osm_landusages_gen0
         WHERE
-          geometry && !bbox! and area>(!pixel_width!*!pixel_width!)
+          geometry && !bbox! and area>(!pixel_width!*!pixel_width!*4)
         ORDER BY
           z_order DESC, area DESC
     - minzoom: 10
       maxzoom: 12
       sql: |-
         SELECT
-          geometry AS way, type, name
+          ST_SimplifyPreserveTopology(geometry,!pixel_width!) AS way, type, name
         FROM
           osm_landusages_gen1
+        WHERE
+          geometry && !bbox! and area>(!pixel_width!*!pixel_width!*4)
         ORDER BY
           z_order DESC, area DESC
     - minzoom: 13
+      maxzoom: 15
+      sql: |-
+        SELECT
+          ST_SimplifyPreserveTopology(geometry,!pixel_width!) AS way, type, name
+        FROM
+          osm_landusages
+        WHERE
+          geometry && !bbox! and area>(!pixel_width!*!pixel_width!*4)
+        ORDER BY
+          z_order DESC, area DESC
+    - minzoom: 16
       maxzoom: 20
       sql: |-
         SELECT
@@ -328,7 +362,7 @@ layers:
         FROM
           osm_waterareas_gen0
         WHERE
-          geometry && !bbox! and area>(!pixel_width!*!pixel_width!)
+          geometry && !bbox! and area>(!pixel_width!*!pixel_width!*4)
         ORDER BY
           area DESC
     - minzoom: 10
@@ -338,6 +372,8 @@ layers:
           geometry AS way, type, name
         FROM
           osm_waterareas_gen1
+        WHERE
+          area > (!pixel_width!*!pixel_width!*4)
         ORDER BY
           area DESC
     - minzoom: 13
@@ -347,6 +383,8 @@ layers:
           geometry AS way, type, name
         FROM
           osm_waterareas
+        WHERE
+          area > (!pixel_width!*!pixel_width!*4)
         ORDER BY
           area DESC
 - name: waterway
